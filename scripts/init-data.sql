@@ -124,18 +124,69 @@ INSERT INTO orders VALUES('200133', '1200.00', '400.00', '2008-06-29', 'C00009',
 
 DROP TABLE IF EXISTS `users`;
 CREATE TABLE `users` (
-  `id` bigint(20) NOT NULL,
+  `id` bigint(20) NOT NULL AUTO_INCREMENT,
   `first_name` char(40) DEFAULT NULL,
   `last_name` char(40) DEFAULT NULL,
   `email` char(40) DEFAULT NULL,
   `password` char(80) NOT NULL,
   `created_at` timestamp(6) NULL DEFAULT current_timestamp(6),
   `updated_at` timestamp(6) NULL DEFAULT current_timestamp(6) ON UPDATE current_timestamp(6),
-  `deleted_at` timestamp(6) NULL DEFAULT NULL
+  `deleted_at` timestamp(6) NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `IDX_97672ac88f789774dd47f7c8be` (`email`)
 ) ENGINE=InnoDB;
-ALTER TABLE `users`
-  ADD PRIMARY KEY (`id`),
-  ADD UNIQUE KEY `IDX_97672ac88f789774dd47f7c8be` (`email`);
-ALTER TABLE `users`
-  MODIFY `id` bigint(20) NOT NULL AUTO_INCREMENT;
+
+DROP TABLE IF EXISTS `roles`;
+CREATE TABLE `roles` (
+    `role_id` bigint(20) PRIMARY KEY,
+    `role_name` char(50) NOT NULL
+) ENGINE=InnoDB;
+
+DROP TABLE IF EXISTS `resources`;
+CREATE TABLE `resources` (
+    `resource_id` bigint(20) PRIMARY KEY,
+    `resource_name` char(50) NOT NULL
+) ENGINE=InnoDB;
+
+DROP TABLE IF EXISTS `actions`;
+CREATE TABLE `actions` (
+    `action_id` bigint(20) PRIMARY KEY,
+    `action_name` char(50) NOT NULL
+) ENGINE=InnoDB;
+
+DROP TABLE IF EXISTS `permissions`;
+CREATE TABLE `permissions` (
+    `permission_id` bigint(20),
+    `resource_id` bigint(20),
+    `action_id` bigint(20),
+    PRIMARY KEY (`permission_id`),
+    KEY `resource_FK` (`resource_id`),
+    CONSTRAINT `resource_FK` FOREIGN KEY (`resource_id`) REFERENCES `resources` (`resource_id`),
+    KEY `action_FK` (`action_id`),
+    CONSTRAINT `action_FK` FOREIGN KEY (`action_id`) REFERENCES `actions` (`action_id`),
+    UNIQUE (`resource_id`, `action_id`)
+) ENGINE=InnoDB;
+
+DROP TABLE IF EXISTS `role_permissions`;
+CREATE TABLE `role_permissions` (
+    `role_id` bigint(20),
+    `permission_id` bigint(20),
+    PRIMARY KEY (`role_id`, `permission_id`),
+    KEY `role_FK` (`role_id`),
+    CONSTRAINT `role_FK` FOREIGN KEY (`role_id`) REFERENCES `roles` (`role_id`),
+    KEY `permission_FK` (`permission_id`),
+    CONSTRAINT `permission_FK` FOREIGN KEY (`permission_id`) REFERENCES `permissions` (`permission_id`)
+) ENGINE=InnoDB;
+
+DROP TABLE IF EXISTS `user_roles`;
+CREATE TABLE `user_roles` (
+    `user_id` bigint(20),
+    `role_id` bigint(20),
+    PRIMARY KEY (`user_id`, `role_id`),
+    KEY `user_FK` (`user_id`),
+    CONSTRAINT `user_FK` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`),
+    KEY `user_roles_role_FK` (`role_id`),
+    CONSTRAINT `user_roles_role_FK` FOREIGN KEY (`role_id`) REFERENCES `roles` (`role_id`)
+) ENGINE=InnoDB;
+
 SET FOREIGN_KEY_CHECKS=1;
