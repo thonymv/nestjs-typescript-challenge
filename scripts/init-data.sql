@@ -133,7 +133,9 @@ CREATE TABLE `users` (
   `updated_at` timestamp(6) NULL DEFAULT current_timestamp(6) ON UPDATE current_timestamp(6),
   `deleted_at` timestamp(6) NULL DEFAULT NULL,
   PRIMARY KEY (`id`),
-  UNIQUE KEY `IDX_97672ac88f789774dd47f7c8be` (`email`)
+  UNIQUE KEY `IDX_97672ac88f789774dd47f7c8be` (`email`),
+  KEY `user_roles_role_FK` (`role_id`),
+  CONSTRAINT `user_roles_role_FK` FOREIGN KEY (`role_id`) REFERENCES `roles` (`role_id`)
 ) ENGINE=InnoDB;
 
 DROP TABLE IF EXISTS `roles`;
@@ -204,16 +206,5 @@ WHERE
   (`roles`.`role_name` = 'admin') OR -- add permissions to admin
   (`roles`.`role_name` = 'agent' AND `resources`.`resource_name` != 'customers') OR -- add permissions to agent
   (`roles`.`role_name` = 'customer' AND `resources`.`resource_name` != 'agents'); -- add permissions to customer
-
-DROP TABLE IF EXISTS `user_roles`;
-CREATE TABLE `user_roles` (
-    `user_id` bigint(20),
-    `role_id` bigint(20),
-    PRIMARY KEY (`user_id`, `role_id`),
-    KEY `user_FK` (`user_id`),
-    CONSTRAINT `user_FK` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`),
-    KEY `user_roles_role_FK` (`role_id`),
-    CONSTRAINT `user_roles_role_FK` FOREIGN KEY (`role_id`) REFERENCES `roles` (`role_id`)
-) ENGINE=InnoDB;
 
 SET FOREIGN_KEY_CHECKS=1;
