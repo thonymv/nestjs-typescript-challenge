@@ -138,25 +138,39 @@ CREATE TABLE `users` (
 
 DROP TABLE IF EXISTS `roles`;
 CREATE TABLE `roles` (
-    `role_id` bigint(20) PRIMARY KEY,
+    `role_id` bigint(20) PRIMARY KEY AUTO_INCREMENT,
     `role_name` char(50) NOT NULL
 ) ENGINE=InnoDB;
 
+INSERT INTO `roles` (`role_name`) VALUES ('admin');
+INSERT INTO `roles` (`role_name`) VALUES ('agent');
+INSERT INTO `roles` (`role_name`) VALUES ('customer');
+INSERT INTO `roles` (`role_name`) VALUES ('guest');
+
 DROP TABLE IF EXISTS `resources`;
 CREATE TABLE `resources` (
-    `resource_id` bigint(20) PRIMARY KEY,
+    `resource_id` bigint(20) PRIMARY KEY AUTO_INCREMENT,
     `resource_name` char(50) NOT NULL
 ) ENGINE=InnoDB;
 
+INSERT INTO resources (`resource_name`) VALUES ('agents');
+INSERT INTO resources (`resource_name`) VALUES ('customers');
+INSERT INTO resources (`resource_name`) VALUES ('orders');
+
 DROP TABLE IF EXISTS `actions`;
 CREATE TABLE `actions` (
-    `action_id` bigint(20) PRIMARY KEY,
+    `action_id` bigint(20) PRIMARY KEY AUTO_INCREMENT,
     `action_name` char(50) NOT NULL
 ) ENGINE=InnoDB;
 
+INSERT INTO actions (`action_name`) VALUES ('view');
+INSERT INTO actions (`action_name`) VALUES ('create');
+INSERT INTO actions (`action_name`) VALUES ('update');
+INSERT INTO actions (`action_name`) VALUES ('delete');
+
 DROP TABLE IF EXISTS `permissions`;
 CREATE TABLE `permissions` (
-    `permission_id` bigint(20),
+    `permission_id` bigint(20) NOT NULL AUTO_INCREMENT,
     `resource_id` bigint(20),
     `action_id` bigint(20),
     PRIMARY KEY (`permission_id`),
@@ -166,6 +180,10 @@ CREATE TABLE `permissions` (
     CONSTRAINT `action_FK` FOREIGN KEY (`action_id`) REFERENCES `actions` (`action_id`),
     UNIQUE (`resource_id`, `action_id`)
 ) ENGINE=InnoDB;
+
+INSERT INTO permissions (`resource_id`, `action_id`) 
+SELECT `resources`.`resource_id`, `actions`.`action_id` 
+FROM `resources` CROSS JOIN `actions`; -- create permissions with all combinations of resources and actions
 
 DROP TABLE IF EXISTS `role_permissions`;
 CREATE TABLE `role_permissions` (
@@ -177,6 +195,15 @@ CREATE TABLE `role_permissions` (
     KEY `permission_FK` (`permission_id`),
     CONSTRAINT `permission_FK` FOREIGN KEY (`permission_id`) REFERENCES `permissions` (`permission_id`)
 ) ENGINE=InnoDB;
+
+INSERT INTO role_permissions (`role_id`, `permission_id`)
+SELECT `roles`.`role_id`, `permissions`.`permission_id`
+FROM `roles` CROSS JOIN `permissions`
+LEFT JOIN `resources` ON `resources`.`resource_id` = `permissions`.`resource_id`
+WHERE 
+  (`roles`.`role_name` = 'admin') OR -- add permissions to admin
+  (`roles`.`role_name` = 'agent' AND `resources`.`resource_name` != 'customers') OR -- add permissions to agent
+  (`roles`.`role_name` = 'customer' AND `resources`.`resource_name` != 'agents'); -- add permissions to customer
 
 DROP TABLE IF EXISTS `user_roles`;
 CREATE TABLE `user_roles` (
