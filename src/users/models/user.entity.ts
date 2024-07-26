@@ -5,7 +5,10 @@ import {
   Entity,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
+  ManyToOne,
+  JoinColumn,
 } from 'typeorm';
+import { Role } from 'src/auth/models/role.entity';
 
 @Entity({ name: 'users' })
 export class User {
@@ -65,4 +68,11 @@ export class User {
     default: null,
   })
   deletedAt: Date;
+
+  @Column({ type: 'bigint', name: 'role_id' })
+  roleId: number;
+
+  @ManyToOne(() => Role, (role) => role.users)
+  @JoinColumn({ name: 'role_id' })
+  role: Role;
 }
