@@ -160,6 +160,7 @@ CREATE TABLE `resources` (
 INSERT INTO resources (`resource_name`) VALUES ('agents');
 INSERT INTO resources (`resource_name`) VALUES ('customers');
 INSERT INTO resources (`resource_name`) VALUES ('orders');
+INSERT INTO resources (`resource_name`) VALUES ('users');
 
 DROP TABLE IF EXISTS `actions`;
 CREATE TABLE `actions` (
@@ -206,7 +207,7 @@ FROM `roles` CROSS JOIN `permissions`
 LEFT JOIN `resources` ON `resources`.`resource_id` = `permissions`.`resource_id`
 WHERE 
   (`roles`.`role_name` = 'admin') OR -- add permissions to admin
-  (`roles`.`role_name` = 'agent' AND `resources`.`resource_name` != 'customers') OR -- add permissions to agent
-  (`roles`.`role_name` = 'customer' AND `resources`.`resource_name` != 'agents'); -- add permissions to customer
+  (`roles`.`role_name` = 'agent' AND `resources`.`resource_name` NOT IN ('customers', 'users')) OR -- add permissions to agent
+  (`roles`.`role_name` = 'customer' AND `resources`.`resource_name` NOT IN ('agents', 'users')); -- add permissions to customer
 
 SET FOREIGN_KEY_CHECKS=1;
