@@ -22,15 +22,20 @@ import {
   ApiTags,
 } from '@nestjs/swagger';
 import { JwtAuthGuard } from './../../../auth/guards/jwt-auth.guard';
+import { PermissionsGuard } from 'src/auth/guards/permissions.guard';
+import { Permissions } from 'src/auth/decorators/permissions.decorator';
+import { ActionName } from 'src/auth/enums/action.enum';
+import { ResourceName } from 'src/auth/enums/resource.enum';
 
 @ApiTags('Customers')
 @ApiBearerAuth()
-@UseGuards(JwtAuthGuard)
+@UseGuards(JwtAuthGuard, PermissionsGuard)
 @Controller('/api/customers')
 export class CustomerController {
   constructor(private customerService: CustomerService) {}
 
   @Get()
+  @Permissions([ActionName.View, ResourceName.Customers])
   @ApiOperation({ summary: 'Get all customers' })
   @ApiResponse({
     status: 200,
@@ -66,6 +71,7 @@ export class CustomerController {
   }
 
   @Get(':custCode')
+  @Permissions([ActionName.View, ResourceName.Customers])
   @ApiOperation({ summary: 'Get customer by custCode with its agent' })
   @ApiResponse({
     status: 200,
@@ -113,6 +119,7 @@ export class CustomerController {
   }
 
   @Post()
+  @Permissions([ActionName.Create, ResourceName.Customers])
   @ApiOperation({ summary: 'Create a new customer' })
   @ApiBody({ type: CreateCustomerDto })
   @ApiResponse({
@@ -153,6 +160,7 @@ export class CustomerController {
   }
 
   @Patch(':custCode')
+  @Permissions([ActionName.Update, ResourceName.Customers])
   @ApiOperation({ summary: 'Update an existing customer' })
   @ApiBody({ type: UpdateCustomerDto })
   @ApiResponse({
@@ -185,6 +193,7 @@ export class CustomerController {
   }
 
   @Delete(':custCode')
+  @Permissions([ActionName.Delete, ResourceName.Customers])
   @ApiOperation({ summary: 'Delete an existing customer by its custCode' })
   @ApiResponse({
     status: 200,

@@ -30,15 +30,23 @@ import {
   ApiTags,
 } from '@nestjs/swagger';
 import { JwtAuthGuard } from './../../../auth/guards/jwt-auth.guard';
+import { PermissionsGuard } from 'src/auth/guards/permissions.guard';
+import { ActionName } from 'src/auth/enums/action.enum';
+import { Permissions } from 'src/auth/decorators/permissions.decorator';
+import { ResourceName } from 'src/auth/enums/resource.enum';
 
 @ApiTags('Orders')
 @ApiBearerAuth()
-@UseGuards(JwtAuthGuard)
+@UseGuards(JwtAuthGuard, PermissionsGuard)
 @Controller('/api/orders')
 export class OrderController {
   constructor(private orderService: OrderService) {}
 
   @Get('total-amount-by-customer')
+  @Permissions(
+    [ActionName.View, ResourceName.Customers],
+    [ActionName.View, ResourceName.Orders],
+  )
   @ApiOperation({ summary: 'Get total amount of orders group by customer' })
   @ApiResponse({
     status: 200,
@@ -61,6 +69,10 @@ export class OrderController {
   }
 
   @Get('total-amount-by-agent')
+  @Permissions(
+    [ActionName.View, ResourceName.Agents],
+    [ActionName.View, ResourceName.Orders],
+  )
   @ApiOperation({ summary: 'Get total amount of orders group by agent' })
   @ApiResponse({
     status: 200,
@@ -83,6 +95,7 @@ export class OrderController {
   }
 
   @Get('total-amount-by-country')
+  @Permissions([ActionName.View, ResourceName.Orders])
   @ApiOperation({ summary: 'Get total amount of orders group by country' })
   @ApiResponse({
     status: 200,
@@ -105,6 +118,7 @@ export class OrderController {
   }
 
   @Get('/')
+  @Permissions([ActionName.View, ResourceName.Orders])
   @ApiOperation({ summary: 'Get all orders (paginated)' })
   @ApiQuery({ name: 'page', required: false })
   @ApiResponse({
@@ -199,6 +213,7 @@ export class OrderController {
   }
 
   @Get(':ordNum')
+  @Permissions([ActionName.View, ResourceName.Orders])
   @ApiOperation({ summary: 'Get an order by ordNum' })
   @ApiResponse({
     status: 200,
@@ -253,6 +268,7 @@ export class OrderController {
   }
 
   @Post()
+  @Permissions([ActionName.Create, ResourceName.Orders])
   @ApiOperation({ summary: 'Create a new order' })
   @ApiBody({ type: CreateOrderDto })
   @ApiResponse({
@@ -286,6 +302,7 @@ export class OrderController {
   }
 
   @Patch(':ordNum')
+  @Permissions([ActionName.Update, ResourceName.Orders])
   @ApiOperation({ summary: 'Update an existing order' })
   @ApiResponse({
     status: 200,
@@ -317,6 +334,7 @@ export class OrderController {
   }
 
   @Delete(':ordNum')
+  @Permissions([ActionName.Delete, ResourceName.Orders])
   @ApiOperation({ summary: 'Delete an existing order by its ordNum' })
   @ApiOperation({ summary: 'Delete an existing customer by its custCode' })
   @ApiResponse({

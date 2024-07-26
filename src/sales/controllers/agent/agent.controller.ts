@@ -22,15 +22,20 @@ import {
   ApiTags,
 } from '@nestjs/swagger';
 import { JwtAuthGuard } from './../../../auth/guards/jwt-auth.guard';
+import { PermissionsGuard } from 'src/auth/guards/permissions.guard';
+import { Permissions } from 'src/auth/decorators/permissions.decorator';
+import { ActionName } from 'src/auth/enums/action.enum';
+import { ResourceName } from 'src/auth/enums/resource.enum';
 
 @ApiTags('Agents')
 @ApiBearerAuth()
-@UseGuards(JwtAuthGuard)
+@UseGuards(JwtAuthGuard, PermissionsGuard)
 @Controller('/api/agents')
 export class AgentController {
   constructor(private agentService: AgentService) {}
 
   @Get()
+  @Permissions([ActionName.View, ResourceName.Agents])
   @ApiOperation({ summary: 'Get all agents' })
   @ApiResponse({
     status: 200,
@@ -61,6 +66,7 @@ export class AgentController {
   }
 
   @Get(':agentCode')
+  @Permissions([ActionName.View, ResourceName.Agents])
   @ApiOperation({ summary: 'Get agent by agentCode with its customers' })
   @ApiResponse({
     status: 200,
@@ -110,6 +116,7 @@ export class AgentController {
   }
 
   @Post()
+  @Permissions([ActionName.Create, ResourceName.Agents])
   @ApiOperation({ summary: 'Create a new agent' })
   @ApiBody({ type: CreateAgentDto })
   @ApiResponse({
@@ -142,6 +149,7 @@ export class AgentController {
   }
 
   @Patch(':agentCode')
+  @Permissions([ActionName.Update, ResourceName.Agents])
   @ApiOperation({ summary: 'Update an existing agents' })
   @ApiBody({ type: UpdateAgentDto })
   @ApiResponse({
@@ -163,6 +171,7 @@ export class AgentController {
   }
 
   @Delete(':agentCode')
+  @Permissions([ActionName.Delete, ResourceName.Agents])
   @ApiOperation({ summary: 'Delete an existing agents by its agentCode' })
   @ApiResponse({
     status: 200,
