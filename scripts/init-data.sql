@@ -141,15 +141,21 @@ CREATE TABLE `users` (
   `last_name` char(40) DEFAULT NULL,
   `email` char(40) DEFAULT NULL,
   `password` char(80) NOT NULL,
+  `role_id` bigint(20),
   `created_at` timestamp(6) NULL DEFAULT current_timestamp(6),
   `updated_at` timestamp(6) NULL DEFAULT current_timestamp(6) ON UPDATE current_timestamp(6),
   `deleted_at` timestamp(6) NULL DEFAULT NULL,
-  `role_id` bigint(20),
   PRIMARY KEY (`id`),
   UNIQUE KEY `IDX_97672ac88f789774dd47f7c8be` (`email`),
   KEY `user_roles_role_FK` (`role_id`),
   CONSTRAINT `user_roles_role_FK` FOREIGN KEY (`role_id`) REFERENCES `roles` (`role_id`)
 ) ENGINE=InnoDB;
+
+INSERT INTO users (`first_name`, `last_name`, `email`, `password`, `role_id`)
+VALUES ('anthony', 'martinez', 'anthony@demo.com', '$2a$10$Veq05YqqfFDb1qQ034Sx4uSalLFo8uynTIpJsRm7LASa4dWFkFOOW', 1);
+
+INSERT INTO users (`first_name`, `last_name`, `email`, `password`, `role_id`)
+VALUES ('jose', 'martinez', 'jose@demo.com', '$2a$10$LVBx3DZzPev5hVz2L01Bt.d./VRnaGlhGNwlZtgcQJPE1gc0alSZG', 2);
 
 DROP TABLE IF EXISTS `resources`;
 CREATE TABLE `resources` (
