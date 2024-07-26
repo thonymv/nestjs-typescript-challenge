@@ -122,6 +122,18 @@ INSERT INTO orders VALUES('200135', '2000.00', '800.00', '2008-09-16', 'C00007',
 INSERT INTO orders VALUES('200131', '900.00', '150.00', '2008-08-26', 'C00012', 'A012', 'SOD');
 INSERT INTO orders VALUES('200133', '1200.00', '400.00', '2008-06-29', 'C00009', 'A002', 'SOD');
 
+DROP TABLE IF EXISTS `roles`;
+CREATE TABLE `roles` (
+    `role_id` bigint(20) NOT NULL AUTO_INCREMENT,
+    `role_name` char(50) NOT NULL,
+    PRIMARY KEY (`role_id`)
+) ENGINE=InnoDB;
+
+INSERT INTO `roles` (`role_name`) VALUES ('admin');
+INSERT INTO `roles` (`role_name`) VALUES ('agent');
+INSERT INTO `roles` (`role_name`) VALUES ('customer');
+INSERT INTO `roles` (`role_name`) VALUES ('guest');
+
 DROP TABLE IF EXISTS `users`;
 CREATE TABLE `users` (
   `id` bigint(20) NOT NULL AUTO_INCREMENT,
@@ -132,22 +144,12 @@ CREATE TABLE `users` (
   `created_at` timestamp(6) NULL DEFAULT current_timestamp(6),
   `updated_at` timestamp(6) NULL DEFAULT current_timestamp(6) ON UPDATE current_timestamp(6),
   `deleted_at` timestamp(6) NULL DEFAULT NULL,
+  `role_id` bigint(20),
   PRIMARY KEY (`id`),
   UNIQUE KEY `IDX_97672ac88f789774dd47f7c8be` (`email`),
   KEY `user_roles_role_FK` (`role_id`),
   CONSTRAINT `user_roles_role_FK` FOREIGN KEY (`role_id`) REFERENCES `roles` (`role_id`)
 ) ENGINE=InnoDB;
-
-DROP TABLE IF EXISTS `roles`;
-CREATE TABLE `roles` (
-    `role_id` bigint(20) PRIMARY KEY AUTO_INCREMENT,
-    `role_name` char(50) NOT NULL
-) ENGINE=InnoDB;
-
-INSERT INTO `roles` (`role_name`) VALUES ('admin');
-INSERT INTO `roles` (`role_name`) VALUES ('agent');
-INSERT INTO `roles` (`role_name`) VALUES ('customer');
-INSERT INTO `roles` (`role_name`) VALUES ('guest');
 
 DROP TABLE IF EXISTS `resources`;
 CREATE TABLE `resources` (
