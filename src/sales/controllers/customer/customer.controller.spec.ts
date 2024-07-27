@@ -4,6 +4,16 @@ import { CustomerService } from '../../services/customer/customer.service';
 import { CustomerController } from './customer.controller';
 import { CreateCustomerDto } from './dto/create-customer.dto';
 import { UpdateCustomerDto } from './dto/update-customer.dto';
+import { User } from 'src/users/models/user.entity';
+import { Agent } from 'src/sales/models/agent.entity';
+import { Customer } from 'src/sales/models/customer.entity';
+import { Order } from 'src/sales/models/order.entity';
+import { Role } from 'src/auth/models/role.entity';
+import { Permission } from 'src/auth/models/permission.entity';
+import { Action } from 'src/auth/models/action.entity';
+import { Resource } from 'src/auth/models/resource.entity';
+import { Repository } from 'typeorm';
+import { getRepositoryToken } from '@nestjs/typeorm';
 
 describe('CustomerController', () => {
   let customerController: CustomerController;
@@ -44,10 +54,27 @@ describe('CustomerController', () => {
       ),
   };
 
+  const entities = [
+    User,
+    Agent,
+    Customer,
+    Order,
+    Role,
+    Permission,
+    Action,
+    Resource,
+  ];
+
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       controllers: [CustomerController],
-      providers: [CustomerService],
+      providers: [
+        ...entities.map((entity) => ({
+          provide: getRepositoryToken(entity),
+          useClass: Repository,
+        })),
+        CustomerService,
+      ],
     })
       .overrideProvider(CustomerService)
       .useValue(mockCustomerService)
