@@ -4,6 +4,16 @@ import { AgentService } from '../../services/agent/agent.service';
 import { AgentController } from './agent.controller';
 import { CreateAgentDto } from './dto/create-agent.dto';
 import { UpdateAgentDto } from './dto/update-agent.dto';
+import { User } from 'src/users/models/user.entity';
+import { Agent } from 'src/sales/models/agent.entity';
+import { Customer } from 'src/sales/models/customer.entity';
+import { Order } from 'src/sales/models/order.entity';
+import { Role } from 'src/auth/models/role.entity';
+import { Permission } from 'src/auth/models/permission.entity';
+import { Action } from 'src/auth/models/action.entity';
+import { Resource } from 'src/auth/models/resource.entity';
+import { Repository } from 'typeorm';
+import { getRepositoryToken } from '@nestjs/typeorm';
 
 describe('AgentController', () => {
   let agentController: AgentController;
@@ -45,10 +55,27 @@ describe('AgentController', () => {
       ),
   };
 
+  const entities = [
+    User,
+    Agent,
+    Customer,
+    Order,
+    Role,
+    Permission,
+    Action,
+    Resource,
+  ];
+
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       controllers: [AgentController],
-      providers: [AgentService],
+      providers: [
+        ...entities.map((entity) => ({
+          provide: getRepositoryToken(entity),
+          useClass: Repository,
+        })),
+        AgentService,
+      ],
     })
       .overrideProvider(AgentService)
       .useValue(mockAgentService)

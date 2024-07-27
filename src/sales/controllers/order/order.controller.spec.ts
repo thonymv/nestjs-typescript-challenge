@@ -1,11 +1,20 @@
 import { NotFoundException } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
 import { Request } from 'express';
-import { Order } from '../../models/order.entity';
 import { OrderService } from '../../services/order/order.service';
 import { CreateOrderDto } from './dto/create-order.dto';
 import { UpdateOrderDto } from './dto/update-order.dto';
 import { OrderController } from './order.controller';
+import { User } from 'src/users/models/user.entity';
+import { Agent } from 'src/sales/models/agent.entity';
+import { Customer } from 'src/sales/models/customer.entity';
+import { Order } from 'src/sales/models/order.entity';
+import { Role } from 'src/auth/models/role.entity';
+import { Permission } from 'src/auth/models/permission.entity';
+import { Action } from 'src/auth/models/action.entity';
+import { Resource } from 'src/auth/models/resource.entity';
+import { Repository } from 'typeorm';
+import { getRepositoryToken } from '@nestjs/typeorm';
 
 describe('OrderController', () => {
   let orderController: OrderController;
@@ -88,10 +97,27 @@ describe('OrderController', () => {
     ),
   };
 
+  const entities = [
+    User,
+    Agent,
+    Customer,
+    Order,
+    Role,
+    Permission,
+    Action,
+    Resource,
+  ];
+
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       controllers: [OrderController],
-      providers: [OrderService],
+      providers: [
+        ...entities.map((entity) => ({
+          provide: getRepositoryToken(entity),
+          useClass: Repository,
+        })),
+        OrderService,
+      ],
     })
       .overrideProvider(OrderService)
       .useValue(mockOrderService)
