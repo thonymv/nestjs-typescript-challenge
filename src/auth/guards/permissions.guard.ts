@@ -41,19 +41,16 @@ export class PermissionsGuard implements CanActivate {
         'role.permissions.resource',
       ],
     });
-    if (!userEntity?.role) return false;
-    const allPermissions = await Promise.all(
-      methodPermissions.map(async ({ actionName, resourceName }) => {
-        return await this.permissionsRepository.find({
-          where: {
-            action: { actionName },
-            resource: { resourceName },
-            roles: { roleId: userEntity.role.roleId },
-          },
-        });
-      }),
-    );
+    if (!userEntity?.role?.permissions) return false;
 
-    return allPermissions.every((permissions) => permissions.length > 0); // the user must have all endpoint permissions
+    const { permissions } = userEntity.role;
+
+    return methodPermissions.every(({ actionName, resourceName }) =>
+      permissions.some(
+        ({ action, resource }) =>
+          action.actionName === actionName &&
+          resource.resourceName === resourceName,
+      ),
+    );
   }
 }
