@@ -15,7 +15,14 @@ jobs:
     runs-on: ubuntu-latest
     
     env:
-      JWT_SECRET: secretKey
+      JWT_SECRET: ${{ secrets.JWT_SECRET }}
+      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+      DB_HOST: ${{ secrets.DB_HOST }}
+      DB_PORT: ${{ secrets.DB_PORT }}
+      DB_USER: ${{ secrets.DB_USER }}
+      DB_PASS: ${{ secrets.DB_PASS }}
+      DB_DATABASE: ${{ secrets.DB_DATABASE }}
 
     strategy:
       matrix:
@@ -32,3 +39,11 @@ jobs:
     - run: npm install
     - run: npm run test
     - run: npm run test:e2e
+    - name: Install serverless globally
+      run: npm install -g serverless
+    - name: Configure serverless authentication
+      run: sls config credentials --provider aws --key ${{ secrets.AWS_ACCESS_KEY_ID }} --secret ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+    - name: Install npm dependencies
+      run: npm ci
+    - name: Deploy lambda function
+      run: sls deploy
