@@ -35,6 +35,8 @@ jobs:
     - run: npm install
     - run: npm run test
     - run: npm run test:e2e
+    - name: Install Serverless Offline Plugin Globally
+      run: npm install serverless-offline
     - name: Serverless Deploy
       uses: serverless/github-action@v3.2
       with:
