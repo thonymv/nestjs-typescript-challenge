@@ -7,6 +7,9 @@ useDotenv: true
 plugins:
   - serverless-offline
 
+package:
+  individually: true
+
 provider:
   name: aws
   runtime: nodejs18.x
