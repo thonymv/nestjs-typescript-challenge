@@ -1,4 +1,4 @@
-import { Test, TestingModule } from '@nestjs/testing';
+import { Test, TestingModuleBuilder } from '@nestjs/testing';
 import { INestApplication, ValidationPipe } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import request from 'supertest';
@@ -10,6 +10,11 @@ import { Agent } from '../../src/sales/models/agent.entity';
 import { Customer } from '../../src/sales/models/customer.entity';
 import { Order } from '../../src/sales/models/order.entity';
 import { User } from '../../src/users/models/user.entity';
+import { Role } from 'src/auth/models/role.entity';
+import { Permission } from 'src/auth/models/permission.entity';
+import { Action } from 'src/auth/models/action.entity';
+import { Resource } from 'src/auth/models/resource.entity';
+import * as helper from '../helper';
 
 jest.mock('bcryptjs', () => {
   return {
@@ -19,6 +24,7 @@ jest.mock('bcryptjs', () => {
 
 describe('SalesController (e2e)', () => {
   let app: INestApplication;
+  let moduleFixture: TestingModuleBuilder;
 
   const customer = {
     custCode: 'C00001',
@@ -54,14 +60,18 @@ describe('SalesController (e2e)', () => {
 
   const mockAgentRepository = {};
   const mockOrderRepository = {};
-  const mockUserRepository = {
-    findOne: jest
-      .fn()
-      .mockImplementation((user) => Promise.resolve({ ...user, id: 1 })),
-  };
+  const mockRoleRepository = {};
+  const mockPermissionRepository = {};
+  const mockActionRepository = {};
+  const mockResourceRepository = {};
+  const mockUserRepository = (user) => ({
+    findOne: jest.fn().mockImplementation(() => {
+      return Promise.resolve(user);
+    }),
+  });
 
   beforeEach(async () => {
-    const moduleFixture: TestingModule = await Test.createTestingModule({
+    moduleFixture = Test.createTestingModule({
       imports: [
         ConfigModule.forRoot({ isGlobal: true }),
         AuthModule,
@@ -76,17 +86,15 @@ describe('SalesController (e2e)', () => {
       .overrideProvider(getRepositoryToken(Order))
       .useValue(mockOrderRepository)
       .overrideProvider(getRepositoryToken(User))
-      .useValue(mockUserRepository)
-      .compile();
-
-    app = moduleFixture.createNestApplication();
-    app.useGlobalPipes(
-      new ValidationPipe({
-        whitelist: true,
-        stopAtFirstError: true,
-      }),
-    );
-    await app.init();
+      .useValue(mockUserRepository(helper.userCustomer))
+      .overrideProvider(getRepositoryToken(Role))
+      .useValue(mockRoleRepository)
+      .overrideProvider(getRepositoryToken(Permission))
+      .useValue(mockPermissionRepository)
+      .overrideProvider(getRepositoryToken(Action))
+      .useValue(mockActionRepository)
+      .overrideProvider(getRepositoryToken(Resource))
+      .useValue(mockResourceRepository);
   });
 
   async function getValidToken() {
@@ -100,6 +108,14 @@ describe('SalesController (e2e)', () => {
   }
 
   it('/api/customers (GET)', async () => {
+    app = (await moduleFixture.compile()).createNestApplication();
+    app.useGlobalPipes(
+      new ValidationPipe({
+        whitelist: true,
+        stopAtFirstError: true,
+      }),
+    );
+    await app.init();
     return request(app.getHttpServer())
       .get('/api/customers')
       .auth(await getValidToken(), { type: 'bearer' })
@@ -109,6 +125,14 @@ describe('SalesController (e2e)', () => {
   });
 
   it('/api/customers (POST)', async () => {
+    app = (await moduleFixture.compile()).createNestApplication();
+    app.useGlobalPipes(
+      new ValidationPipe({
+        whitelist: true,
+        stopAtFirstError: true,
+      }),
+    );
+    await app.init();
     return request(app.getHttpServer())
       .post('/api/customers')
       .auth(await getValidToken(), { type: 'bearer' })
@@ -119,6 +143,14 @@ describe('SalesController (e2e)', () => {
   });
 
   it('/api/customers (POST) should fail because missing parameters', async () => {
+    app = (await moduleFixture.compile()).createNestApplication();
+    app.useGlobalPipes(
+      new ValidationPipe({
+        whitelist: true,
+        stopAtFirstError: true,
+      }),
+    );
+    await app.init();
     return request(app.getHttpServer())
       .post('/api/customers')
       .auth(await getValidToken(), { type: 'bearer' })
@@ -128,6 +160,14 @@ describe('SalesController (e2e)', () => {
   });
 
   it('/api/customers (UPDATE)', async () => {
+    app = (await moduleFixture.compile()).createNestApplication();
+    app.useGlobalPipes(
+      new ValidationPipe({
+        whitelist: true,
+        stopAtFirstError: true,
+      }),
+    );
+    await app.init();
     return request(app.getHttpServer())
       .patch('/api/customers/C00001')
       .auth(await getValidToken(), { type: 'bearer' })
@@ -138,6 +178,14 @@ describe('SalesController (e2e)', () => {
   });
 
   it('/api/customers (UPDATE) should fail because invalid parameter', async () => {
+    app = (await moduleFixture.compile()).createNestApplication();
+    app.useGlobalPipes(
+      new ValidationPipe({
+        whitelist: true,
+        stopAtFirstError: true,
+      }),
+    );
+    await app.init();
     return request(app.getHttpServer())
       .patch('/api/customers/C00001')
       .auth(await getValidToken(), { type: 'bearer' })
@@ -147,6 +195,14 @@ describe('SalesController (e2e)', () => {
   });
 
   it('/api/customers (DELETE)', async () => {
+    app = (await moduleFixture.compile()).createNestApplication();
+    app.useGlobalPipes(
+      new ValidationPipe({
+        whitelist: true,
+        stopAtFirstError: true,
+      }),
+    );
+    await app.init();
     return request(app.getHttpServer())
       .delete('/api/customers/C00001')
       .auth(await getValidToken(), { type: 'bearer' })
@@ -156,5 +212,9 @@ describe('SalesController (e2e)', () => {
         raw: [],
         affected: 1,
       });
+  });
+
+  afterEach(async () => {
+    await app.close();
   });
 });
