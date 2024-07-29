@@ -36,7 +36,7 @@ export class UsersController {
       },
     },
   })
-  async update(
+  async updateUserRole(
     @Param('userId') userId: number,
     @Body() updateUserRoleDto: UpdateUserRoleDto,
   ): Promise<UpdateResult> {
