@@ -3,7 +3,6 @@ import { Reflector } from '@nestjs/core';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from 'src/users/models/user.entity';
 import { Repository } from 'typeorm';
-import { Permission } from '../models/permission.entity';
 import { PERMISSIONS_KEY } from 'src/constants/rbac.constants';
 import { ActionName } from '../enums/action.enum';
 import { ResourceName } from '../enums/resource.enum';
@@ -14,8 +13,6 @@ export class PermissionsGuard implements CanActivate {
     private reflector: Reflector,
     @InjectRepository(User)
     private usersRepository: Repository<User>,
-    @InjectRepository(Permission)
-    private permissionsRepository: Repository<Permission>,
   ) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
