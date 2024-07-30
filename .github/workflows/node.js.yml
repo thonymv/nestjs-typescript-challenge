@@ -38,7 +38,7 @@ jobs:
     
     - name: Build the project
       run: |
-        npm instal -g @nestjs/cli@10.4.2
+        npm install -g @nestjs/cli@10.4.2
         npm run build
 
     - name: Install serverless and deploy
