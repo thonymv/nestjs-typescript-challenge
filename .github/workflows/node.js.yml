@@ -35,11 +35,9 @@ jobs:
     - run: npm ci
     - run: npm run test
     - run: npm run test:e2e
-    - name: Serverless Deploy
-      uses: serverless/github-action@v3.2
-      with:
-        args: -c "serverless plugin install --name serverless-offline && serverless deploy"
-        entrypoint: /bin/sh
-      env:
-        AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-        AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+    
+    - name: Install serverless and deploy
+      run: |
+        npm install -g serverless@3.x
+        serverless config credentials --provider aws --key ${{ secrets.AWS_ACCESS_KEY_ID }} --secret ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        serverless deploy
