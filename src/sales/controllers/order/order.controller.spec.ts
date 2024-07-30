@@ -15,6 +15,7 @@ import { Action } from 'src/auth/models/action.entity';
 import { Resource } from 'src/auth/models/resource.entity';
 import { Repository } from 'typeorm';
 import { getRepositoryToken } from '@nestjs/typeorm';
+import { AwsService } from 'src/aws/aws.service';
 
 describe('OrderController', () => {
   let orderController: OrderController;
@@ -117,6 +118,7 @@ describe('OrderController', () => {
           useClass: Repository,
         })),
         OrderService,
+        AwsService,
       ],
     })
       .overrideProvider(OrderService)

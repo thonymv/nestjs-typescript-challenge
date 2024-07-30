@@ -12,6 +12,7 @@ import { UsersService } from './services/users.service';
 import { Repository } from 'typeorm';
 import { UpdateUserRoleDto } from './dto/update-user-role.dto';
 import { User } from './models/user.entity';
+import { AwsService } from 'src/aws/aws.service';
 
 describe('UsersController', () => {
   let controller: UsersController;
@@ -41,6 +42,7 @@ describe('UsersController', () => {
           },
         },
         UsersService,
+        AwsService,
       ],
     }).compile();
 
