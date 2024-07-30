@@ -39,5 +39,6 @@ jobs:
     - name: Install serverless and deploy
       run: |
         npm install -g serverless@3.x
+        serverless plugin install --name serverless-offline
         serverless config credentials --provider aws --key ${{ secrets.AWS_ACCESS_KEY_ID }} --secret ${{ secrets.AWS_SECRET_ACCESS_KEY }}
         serverless deploy
