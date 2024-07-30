@@ -16,6 +16,7 @@ export class AwsService {
   }
 
   private async putMetricData(
+    Namespace: string,
     metricName: string,
     value: number,
     dimensions?: { Name: string; Value: string }[],
@@ -29,7 +30,7 @@ export class AwsService {
           Value: value,
         },
       ],
-      Namespace: 'UserAuthenticationMetrics',
+      Namespace,
     };
 
     try {
@@ -55,6 +56,6 @@ export class AwsService {
       { Name: 'AbleToAccess', Value: ableToAccess },
     ];
 
-    await this.putMetricData('UserLogin', 1, dimensions);
+    await this.putMetricData('UserAccessMetrics', 'UserLogin', 1, dimensions);
   }
 }
