@@ -7,12 +7,13 @@ import { Permission } from 'src/auth/models/permission.entity';
 import { Action } from 'src/auth/models/action.entity';
 import { Resource } from 'src/auth/models/resource.entity';
 import { UsersController } from './users.controller';
+import { AwsService } from 'src/aws/aws.service';
 
 @Module({
   imports: [
     TypeOrmModule.forFeature([User, Role, Permission, Action, Resource]),
   ],
-  providers: [UsersService],
+  providers: [UsersService, AwsService],
   exports: [UsersService],
   controllers: [UsersController],
 })

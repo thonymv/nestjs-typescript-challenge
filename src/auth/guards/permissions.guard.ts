@@ -6,6 +6,7 @@ import { Repository } from 'typeorm';
 import { PERMISSIONS_KEY } from 'src/constants/rbac.constants';
 import { ActionName } from '../enums/action.enum';
 import { ResourceName } from '../enums/resource.enum';
+import { AwsService } from 'src/aws/aws.service';
 
 @Injectable()
 export class PermissionsGuard implements CanActivate {
@@ -13,6 +14,7 @@ export class PermissionsGuard implements CanActivate {
     private reflector: Reflector,
     @InjectRepository(User)
     private usersRepository: Repository<User>,
+    private awsService: AwsService,
   ) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
@@ -28,7 +30,7 @@ export class PermissionsGuard implements CanActivate {
       return true;
     }
 
-    const { user } = context.switchToHttp().getRequest();
+    const { user, url } = context.switchToHttp().getRequest();
     const userEntity = await this.usersRepository.findOne({
       where: { id: user.id },
       relations: [
@@ -42,12 +44,20 @@ export class PermissionsGuard implements CanActivate {
 
     const { permissions } = userEntity.role;
 
-    return methodPermissions.every(({ actionName, resourceName }) =>
+    const canAccess = methodPermissions.every(({ actionName, resourceName }) =>
       permissions.some(
         ({ action, resource }) =>
           action.actionName === actionName &&
           resource.resourceName === resourceName,
       ),
     );
+
+    this.awsService.recordUserAccess({
+      userType: userEntity.role.roleName,
+      endpoint: url,
+      ableToAccess: `${canAccess}`,
+    });
+
+    return canAccess;
   }
 }

@@ -6,6 +6,7 @@ import { AppService } from './app.service';
 import { SalesModule } from './sales/sales.module';
 import { AuthModule } from './auth/auth.module';
 import { UsersModule } from './users/users.module';
+import { AwsService } from './aws/aws.service';
 
 @Module({
   imports: [
@@ -27,6 +28,6 @@ import { UsersModule } from './users/users.module';
     UsersModule,
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [AppService, AwsService],
 })
 export class AppModule {}

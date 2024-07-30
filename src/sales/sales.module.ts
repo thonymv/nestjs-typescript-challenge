@@ -14,6 +14,7 @@ import { Role } from 'src/auth/models/role.entity';
 import { Permission } from 'src/auth/models/permission.entity';
 import { Action } from 'rxjs/internal/scheduler/Action';
 import { Resource } from 'src/auth/models/resource.entity';
+import { AwsService } from 'src/aws/aws.service';
 
 @Module({
   imports: [
@@ -29,6 +30,6 @@ import { Resource } from 'src/auth/models/resource.entity';
     ]),
   ],
   controllers: [AgentController, CustomerController, OrderController],
-  providers: [AgentService, CustomerService, OrderService],
+  providers: [AgentService, CustomerService, OrderService, AwsService],
 })
 export class SalesModule {}
