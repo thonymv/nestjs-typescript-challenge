@@ -6,6 +6,16 @@ useDotenv: true
 
 package:
   individually: true
+  exclude:
+  - '**/test/**'
+  - '**/*.spec.ts'
+  - '**/*.e2e.ts'
+  - '**/e2e/**'
+  - '**/*.map'
+  - '**/docs/**'
+  - '**/*.md'
+  - 'node_modules/**/test/**'
+  - 'node_modules/**/*.e2e.ts'
 
 provider:
   name: aws
