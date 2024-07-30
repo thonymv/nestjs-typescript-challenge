@@ -8,34 +8,47 @@ import { Callback, Context, Handler } from 'aws-lambda';
 let server: Handler;
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
+  try {
+    console.log('Bootstrap start');
+    const app = await NestFactory.create(AppModule);
 
-  app.useGlobalPipes(
-    new ValidationPipe({
-      whitelist: true,
-      stopAtFirstError: true,
-    }),
-  );
+    app.useGlobalPipes(
+      new ValidationPipe({
+        whitelist: true,
+        stopAtFirstError: true,
+      }),
+    );
 
-  const config = new DocumentBuilder()
-    .setTitle('nestjs-typescript-challenge')
-    .setDescription(
-      'This challenge uses Nest.js as its framework to implement three API Rest endpoints (agents, customers and orders) with passportjs authentication.',
-    )
-    .addTag('Auth')
-    .addTag('Agents')
-    .addTag('Customers')
-    .addTag('Orders')
-    .addBearerAuth()
-    .addServer('/dev')
-    .build();
-  const document = SwaggerModule.createDocument(app, config);
-  SwaggerModule.setup('/api/docs', app, document);
+    console.log('NestJS application created');
 
-  await app.init();
+    const config = new DocumentBuilder()
+      .setTitle('nestjs-typescript-challenge')
+      .setDescription(
+        'This challenge uses Nest.js as its framework to implement three API Rest endpoints (agents, customers and orders) with passportjs authentication.',
+      )
+      .addTag('Auth')
+      .addTag('Agents')
+      .addTag('Customers')
+      .addTag('Orders')
+      .addBearerAuth()
+      .addServer('/dev')
+      .build();
 
-  const expressApp = app.getHttpAdapter().getInstance();
-  return serverlessExpress({ app: expressApp });
+    const document = SwaggerModule.createDocument(app, config);
+    SwaggerModule.setup('/api/docs', app, document);
+
+    console.log('Swagger setup complete');
+
+    await app.init();
+    console.log('Application initialized');
+
+    const expressApp = app.getHttpAdapter().getInstance();
+    console.log('Express app instance obtained');
+    return serverlessExpress({ app: expressApp });
+  } catch (error) {
+    console.error('Error during bootstrap:', error);
+    throw error;
+  }
 }
 
 export const handler: Handler = async (
@@ -43,6 +56,7 @@ export const handler: Handler = async (
   context: Context,
   callback: Callback,
 ) => {
+  console.log('Handler invoked with event:', JSON.stringify(event));
   server = server ?? (await bootstrap());
   return server(event, context, callback);
 };
