@@ -32,10 +32,15 @@ jobs:
       with:
         node-version: 18.x
         cache: 'npm'
-    - run: npm ci
+    - run: npm install
     - run: npm run test
     - run: npm run test:e2e
     
+    - name: Build the project
+      run: |
+        npm instal -g @nestjs/cli@10.4.2
+        npm run build
+
     - name: Install serverless and deploy
       run: |
         npm install -g serverless@3.x
