@@ -4,9 +4,6 @@ frameworkVersion: "3"
 
 useDotenv: true
 
-plugins:
-  - serverless-offline
-
 package:
   individually: true
 
